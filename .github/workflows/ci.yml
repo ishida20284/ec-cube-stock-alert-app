@@ -1,0 +1,50 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    if: vars.ENABLE_CI == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: .env を用意する
+        run: |
+          {
+            echo "ECCUBE_AUTH_MAGIC=$(openssl rand -hex 32)"
+            echo "UID=$(id -u)"
+            echo "GID=$(id -g)"
+            echo "WEB_DRIVER_HOST=chrome"
+            echo "WEB_DRIVER_PORT=4444"
+            echo "BASE_URL=http://ec-cube"
+            echo "MAILCATCHER_HOST=mailcatcher"
+          } >> .env
+
+      - name: コンテナを起動する
+        run: docker compose up -d
+
+      - name: アプリの起動を待つ
+        run: |
+          timeout 300 bash -c \
+            'until docker compose ps ec-cube --format "{{.Status}}" | grep -qi healthy; do sleep 5; done'
+
+      - name: E2Eテストを実行する
+        run: |
+          docker compose exec -T -e NO_FIXTURES=1 -e APP_ENV=test ec-cube \
+            vendor/bin/codecept run acceptance -g stock_alert --env chrome-headless
+
+      - name: 失敗時にログを出力する
+        if: failure()
+        run: docker compose logs
+
+      - name: コンテナを停止する
+        if: always()
+        run: docker compose down -v

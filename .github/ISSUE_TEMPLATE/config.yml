@@ -1,0 +1,7 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 質問・相談はこちら（Discussions）
+    url: https://github.com/nsk-bt/ec-cube-stock-alert-app/discussions
+    about: |
+      課題の進め方・実装で詰まった・エラーの原因が分からない、などの質問は Issue ではなく Discussions に投稿してください。
+      Issue は「課題の不備の報告」「明確な不具合の報告」専用です。質問は必ず Discussions へお願いします。

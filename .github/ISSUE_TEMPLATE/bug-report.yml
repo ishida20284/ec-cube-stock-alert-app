@@ -1,0 +1,49 @@
+name: 🐛 不具合の報告
+description: テンプレートそのものの不具合（提供済みのE2Eテストが動かない・CI が壊れている等）を報告します（質問は Discussions へ）
+title: "[Bug] "
+labels: ["不具合"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## ⚠️ 投稿前にご確認ください
+
+        - 自分の実装が動かない・エラーが出る、などの **質問は [Discussions](https://github.com/nsk-bt/ec-cube-stock-alert-app/discussions) に投稿してください**。
+        - このテンプレートは **テンプレートリポジトリそのものの不具合**（提供済みのCodeceptionテストが起動しない、docker compose upが失敗する、CI が壊れている、など）を報告するためのものです。
+        - まずは README の「環境構築」を見直し、`docker compose logs` の内容を確認してから投稿してください。
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 確認事項
+      options:
+        - label: これは自分の実装に関する質問ではなく、テンプレート側の不具合の報告です
+          required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: 不具合の概要
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 再現手順
+      placeholder: |
+        1. `docker compose up -d` を実行
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期待する動作
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 実際の動作（ログ・エラーメッセージ）
+      render: shell
+    validations:
+      required: true

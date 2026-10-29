@@ -1,0 +1,34 @@
+name: 📘 課題に関する報告
+description: 課題内容そのものの不備・誤り・改善提案を報告します（質問は Discussions へ）
+title: "[課題] "
+labels: ["課題"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## ⚠️ 投稿前にご確認ください
+
+        - 「実装方法が分からない」「エラーの原因を教えてほしい」などの **質問は [Discussions](https://github.com/nsk-bt/ec-cube-stock-alert-app/discussions) に投稿してください**。
+        - このテンプレートは **課題ドキュメント（README / AGENTS.md など）の不備・誤り・改善提案** を報告するためのものです。
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 確認事項
+      options:
+        - label: これは質問ではなく、課題内容そのものに対しての報告です
+          required: true
+  - type: textarea
+    id: target
+    attributes:
+      label: 対象箇所
+      description: 該当のファイル・セクション・URL を記載してください
+      placeholder: 例）README.md の「画面仕様」セクション
+    validations:
+      required: true
+  - type: textarea
+    id: detail
+    attributes:
+      label: 内容
+      description: 何が問題か、どう改善すべきかを具体的に記載してください
+    validations:
+      required: true

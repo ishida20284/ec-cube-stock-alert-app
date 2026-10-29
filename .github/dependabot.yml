@@ -1,0 +1,17 @@
+# 依存関係の更新を Dependabot に監視させる設定。
+#
+# 監視対象は GitHub Actions のみとする。
+# composer / npm / docker は、EC-CUBE 本体と Docker 環境のバージョンを
+# 教材として取り込み時点に意図的に固定しているため（docs/MAINTENANCE.md の
+# 「リポジトリ配布方式」を参照）、自動更新の対象にはしない。
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: ci
+    labels:
+      - dependencies

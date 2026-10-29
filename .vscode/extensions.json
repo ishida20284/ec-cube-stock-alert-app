@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "xdebug.php-debug",
+    "bmewburn.vscode-intelephense-client",
+    "mblode.twig-language-2",
+    "EditorConfig.EditorConfig"
+  ]
+}

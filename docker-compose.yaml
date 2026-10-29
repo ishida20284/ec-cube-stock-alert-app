@@ -1,0 +1,81 @@
+services:
+  ec-cube:
+    build:
+      context: .
+      dockerfile: dockerbuild/Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      # EC-CUBE公式構成では var(キャッシュ・ログ)と vendor(依存ライブラリ)を
+      # named volume に分離しているが、それだとホスト側に実体が無く、
+      # IDEからライブラリのコードを参照したりログファイルを開いたりできない。
+      # 本課題はLinux前提でバインドマウントのオーバーヘッドが無いため、分離せずにマウントする。
+      - ".:/var/www/html:cached"
+    environment:
+      APP_ENV: dev
+      APP_DEBUG: 1
+      DATABASE_URL: "mysql://dbuser:secret@mysql/eccubedb"
+      DATABASE_SERVER_VERSION: "8.4"
+      DATABASE_CHARSET: "utf8mb4"
+      MAILER_DSN: "smtp://mailcatcher:1025"
+      # .env に ECCUBE_AUTH_MAGIC を設定しない限り起動できないようにする
+      ECCUBE_AUTH_MAGIC: "${ECCUBE_AUTH_MAGIC:?ECCUBE_AUTH_MAGIC が未設定です。README.md の手順に従って .env に安全なランダム値を設定してください}"
+      # 初回起動時、コンテナ内の www-data のUID/GIDをホストユーザーに合わせる。
+      # 未設定だと初期化処理でマウント先ディレクトリ全体がwww-data(コンテナ内の固定UID)所有になり、
+      # ホスト側でファイルが編集・git操作できなくなる。
+      USER_ID: "${UID:-1000}"
+      GROUP_ID: "${GID:-1000}"
+      # VS Code + Xdebug でブレークポイントデバッグをする場合のみ .env で debug に変更する
+      XDEBUG_MODE: "${XDEBUG_MODE:-off}"
+      ECCUBE_PHPINFO_ENABLED: "${ECCUBE_PHPINFO_ENABLED:-0}"
+    extra_hosts:
+      # XdebugがホストのIDEに接続するために使う。Docker Desktopでは無くても動くが、
+      # Linuxのdocker Engineではhost.docker.internalが未定義のため明示的に追加する。
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - backend
+
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: dbuser
+      MYSQL_PASSWORD: secret
+    volumes:
+      - "mysql-data:/var/lib/mysql"
+      - "./dockerbuild/grant_to_dbuser.sql:/docker-entrypoint-initdb.d/grant_to_dbuser.sql"
+    networks:
+      - backend
+    healthcheck:
+      test: mysqladmin ping
+      interval: 3s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
+
+  mailcatcher:
+    image: schickling/mailcatcher
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+    networks:
+      - backend
+
+  chrome:
+    # E2Eテスト(Codeception acceptanceスイート)用のWebDriver。
+    # ec-cubeコンテナからは "chrome" というホスト名で参照する。
+    image: selenium/standalone-chrome:4.27
+    shm_size: 2gb
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local

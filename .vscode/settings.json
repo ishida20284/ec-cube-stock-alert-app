@@ -1,0 +1,27 @@
+{
+  "github.copilot.enable": {
+    "*": false
+  },
+  "files.watcherExclude": {
+    "**/vendor/**": true,
+    "**/var/**": true
+  },
+  "editor.formatOnSave": false,
+  // Intelephense のインデックス対象から var/ を除外する。
+  // var/cache には EC-CUBE が生成した PHP が1000ファイル以上あり、
+  // 除外しないと初回インデックスが重く、定義ジャンプが生成コードに飛んでしまう。
+  // ここに値を書くと既定の除外リストを上書きするため、既定分も併記している。
+  "intelephense.files.exclude": [
+    "**/.git/**",
+    "**/.svn/**",
+    "**/.hg/**",
+    "**/CVS/**",
+    "**/.DS_Store/**",
+    "**/node_modules/**",
+    "**/bower_components/**",
+    "**/vendor/**/{Tests,tests}/**",
+    "**/var/**"
+  ],
+  // コンテナの PHP バージョンに合わせる（合わせないと 8.2 以降の構文を前提に診断されてしまう）
+  "intelephense.environment.phpVersion": "8.1.0"
+}
